@@ -1,0 +1,48 @@
+---
+
+# 4. `lab2/requirements/traceability-matrix.md`
+
+```markdown
+# Консолідована Матриця Трасування M:N (Вимоги ↔ Use Cases)
+
+## 1. Реєстр Прецедентів (Use Cases)
+
+| UC ID | Назва Use Case | Актор |
+|---|---|---|
+| UC-01 | Пошук та перегляд каталогу | Guest |
+| UC-02 | Авторизація (Log In) | Guest |
+| UC-03 | Перегляд власного профілю та історії `Loan` | User |
+| UC-04 | Створення запиту на видачу книги (`Loan`) | User |
+| UC-05 | Додавання нової книги `Book` та автора `Author` | Librarian |
+| UC-06 | Підтвердження повернення книги (`returned_at`) | Librarian |
+| UC-07 | Автоматичне відправлення нагадувань про борги | Notification Service (`<<System>>`) |
+
+> **Примітка:** `UC-02 (Log In)` виступає **передумовою (Precondition)** для авторизованих дієприкметників і НЕ зв'язується через `<<include>>`.
+
+---
+
+## 2. Зведена Матриця M:N
+
+| EARS Вимога | Тип | UC-01 | UC-02 | UC-03 | UC-04 | UC-05 | UC-06 | UC-07 | Статус |
+|---|---|---|---|---|---|---|---|---|---|
+| **REQ-SYS-001** | Ubiquitous | ✔ | | | | ✔ | | | **COVERED** |
+| **REQ-SYS-002** | Ubiquitous | | ✔ | ✔ | | | | | **COVERED** |
+| **REQ-SYS-003** | Ubiquitous | | | ✔ | ✔ | ✔ | ✔ | | **COVERED** |
+| **REQ-EVN-001** | Event-driven | | | | ✔ | | | | **COVERED** |
+| **REQ-EVN-002** | Event-driven | | | | | | ✔ | | **COVERED** |
+| **REQ-EVN-003** | Event-driven | | | | | | | ✔ | **COVERED** |
+| **REQ-STA-001** | State-driven | ✔ | ✔ | | ✔ | | | | **COVERED** |
+| **REQ-STA-002** | State-driven | | | | ✔ | | | | **COVERED** |
+| **REQ-OPT-001** | Optional | ✔ | | | | ✔ | | | **COVERED** |
+| **REQ-UNW-001** | Unwanted | | | | ✔ | | | | **COVERED** |
+| **REQ-UNW-002** | Unwanted | | | ✔ | | | | | **COVERED** |
+| **REQ-OUT-01** | Out of Scope | | | | | | | | **UNCOVERED** |
+| **Всього зв'язків:** | | **3** | **2** | **3** | **5** | **3** | **2** | **1** | **19 зв'язків** |
+
+---
+
+## 3. Непокрита вимога (Uncovered Requirement)
+
+| ID Вимоги | Причина відсутності покриття | Заплановано |
+|---|---|---|
+| **REQ-OUT-01** (Онлайн-оплата) | Виходить за межі поточного функціоналу системи і не реалізується у базовому веб-сервісі. | Майбутні релізи |
