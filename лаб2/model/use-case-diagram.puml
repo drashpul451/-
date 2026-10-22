@@ -15,13 +15,14 @@ actor "Guest" as Guest
 actor "User" as User
 actor "Librarian" as Librarian
 
-' Успадкування ролей
+' Успадкування ролей: User є розширенням Guest, а Librarian — розширенням User
+Guest <|-- User
 User <|-- Librarian
 
 ' ---------- Система ----------
 rectangle "E-Library System" {
 
-  ' Блок Гостя
+  ' Блок Гостя (доступний також User та Librarian через успадкування)
   usecase "UC-01: Пошук та перегляд каталогу" as UC01
   usecase "UC-02: Фільтрація за автором/роком" as UC02
   usecase "UC-03: Авторизація (Log In)" as UC03
@@ -45,12 +46,15 @@ rectangle "Notification Service\n<<System>>" as NotifSvc {
 }
 
 ' ---------- Основні зв'язки акторів ----------
+' Guest має прямий доступ до пошуку та авторизації
 Guest --> UC01
 Guest --> UC03
 
+' User має свої специфічні прецеденти + успадковує UC01/UC03 від Guest
 User --> UC04
 User --> UC05
 
+' Librarian має свої специфічні прецеденти + успадковує все від User
 Librarian --> UC07
 Librarian --> UC09
 
