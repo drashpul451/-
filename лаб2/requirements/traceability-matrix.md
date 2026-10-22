@@ -4,40 +4,43 @@
 
 | UC ID | Назва Use Case | Актор |
 |---|---|---|
-| UC-01 | Пошук та перегляд каталогу | Guest |
-| UC-02 | Авторизація (Log In) | Guest |
-| UC-03 | Перегляд власного профілю та історії `Loan` | User |
-| UC-04 | Створення запиту на видачу книги (`Loan`) | User |
-| UC-05 | Додавання нової книги `Book` та автора `Author` | Librarian |
-| UC-06 | Підтвердження повернення книги (`returned_at`) | Librarian |
-| UC-07 | Автоматичне відправлення нагадувань про борги | Notification Service (`<<System>>`) |
+| **UC-01** | Пошук та перегляд каталогу | Guest (успадковує User, Librarian) |
+| **UC-02** | Фільтрація за автором/роком (`<<extend>>` UC-01) | Guest |
+| **UC-03** | Авторизація (Log In) | Guest |
+| **UC-04** | Перегляд історії Loan | User |
+| **UC-05** | Створення запиту на Loan | User |
+| **UC-06** | Скасування бронювання (`<<extend>>` UC-05) | User |
+| **UC-07** | Додавання Book та Author | Librarian |
+| **UC-08** | Перевірка унікальності ISBN (`<<include>>` UC-07) | Librarian |
+| **UC-09** | Підтвердження повернення книги | Librarian |
+| **UC-10** | Формування сповіщень про борги (`<<delegate>>`) | Notification Service (`<<System>>`) |
 
-> **Примітка:** `UC-02 (Log In)` виступає **передумовою (Precondition)** для авторизованих дієприкметників і НЕ зв'язується через `<<include>>`.
+> **Примітка:** `UC-03 (Log In)` виступає **передумовою (Precondition)** для авторизованих дій і НЕ зв'язується через `<<include>>`.
 
 ---
 
 ## 2. Зведена Матриця M:N
 
-| EARS Вимога | Тип | UC-01 | UC-02 | UC-03 | UC-04 | UC-05 | UC-06 | UC-07 | Статус |
-|---|---|---|---|---|---|---|---|---|---|
-| **REQ-SYS-001** | Ubiquitous | ✔ | | | | ✔ | | | **COVERED** |
-| **REQ-SYS-002** | Ubiquitous | | ✔ | ✔ | | | | | **COVERED** |
-| **REQ-SYS-003** | Ubiquitous | | | ✔ | ✔ | ✔ | ✔ | | **COVERED** |
-| **REQ-EVN-001** | Event-driven | | | | ✔ | | | | **COVERED** |
-| **REQ-EVN-002** | Event-driven | | | | | | ✔ | | **COVERED** |
-| **REQ-EVN-003** | Event-driven | | | | | | | ✔ | **COVERED** |
-| **REQ-STA-001** | State-driven | ✔ | ✔ | | ✔ | | | | **COVERED** |
-| **REQ-STA-002** | State-driven | | | | ✔ | | | | **COVERED** |
-| **REQ-OPT-001** | Optional | ✔ | | | | ✔ | | | **COVERED** |
-| **REQ-UNW-001** | Unwanted | | | | ✔ | | | | **COVERED** |
-| **REQ-UNW-002** | Unwanted | | | ✔ | | | | | **COVERED** |
-| **REQ-OUT-01** | Out of Scope | | | | | | | | **UNCOVERED** |
-| **Всього зв'язків:** | | **3** | **2** | **3** | **5** | **3** | **2** | **1** | **19 зв'язків** |
+| EARS Вимога | Тип | UC-01 | UC-02 | UC-03 | UC-04 | UC-05 | UC-06 | UC-07 | UC-08 | UC-09 | UC-10 | Статус |
+|---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **REQ-UBI-01** | Ubiquitous | ✔ | | | ✔ | ✔ | | ✔ | | ✔ | | **COVERED** |
+| **REQ-UBI-02** | Ubiquitous | | | | ✔ | ✔ | ✔ | | | ✔ | | **COVERED** |
+| **REQ-EVT-01** | Event-driven | | | | | ✔ | | | | | | **COVERED** |
+| **REQ-EVT-02** | Event-driven | | | | | | | | | ✔ | | **COVERED** |
+| **REQ-EVT-03** | Event-driven | | | | | | | ✔ | ✔ | | | **COVERED** |
+| **REQ-STA-01** | State-driven | | | ✔ | ✔ | | | | | | | **COVERED** |
+| **REQ-STA-02** | State-driven | | | | | ✔ | | | | | | **COVERED** |
+| **REQ-EXC-01** | Exception | | | | | ✔ | | | | | | **COVERED** |
+| **REQ-EXC-02** | Exception | | | | | | | ✔ | ✔ | | | **COVERED** |
+| **REQ-OPT-01** | Optional | | | | | | | | | | ✔ | **COVERED** |
+| **REQ-NFR-PERF-01** | NFR (Perf) | ✔ | ✔ | | | | | | | | | **COVERED** |
+| **REQ-NFR-SEC-01** | NFR (Sec) | | | ✔ | | | | | | | | **COVERED** |
+| **REQ-OUT-01** | Out of Scope | | | | | | | | | | | **UNCOVERED** |
 
 ---
 
 ## 3. Непокрита вимога (Uncovered Requirement)
 
-| ID Вимоги | Причина відсутності покриття | Заплановано |
-|---|---|---|
-| **REQ-OUT-01** (Онлайн-оплата) | Виходить за межі поточного функціоналу системи і не реалізується у базовому веб-сервісі. | Майбутні релізи |
+| ID Вимоги | Назва вимоги | Причина відсутності покриття | Заплановано |
+|---|---|---|---|
+| **REQ-OUT-01** | Онлайн-оплата штрафів | Виходить за межі поточного функціоналу системи і не реалізується у базовому релізі. | Майбутні релізи |
