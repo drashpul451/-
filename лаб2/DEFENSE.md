@@ -19,5 +19,5 @@
 3) Збережено концептуальний зв'язок M:N між `Author` та `Book`.
 
 ### Здача:
-(а) Посилання на GitHub PR: `https://github.com/drashpul/e-library/pull/2`
+(а) Посилання на GitHub: `[https://github.com/drashpul/e-library/pull/2](https://github.com/madrashp/-)`
 (б) Цей заповнений DEFENSE.md.
