@@ -7,50 +7,66 @@ skinparam shadowing false
 skinparam actorStyle awesome
 skinparam packageStyle rectangle
 skinparam usecaseFontSize 12
-skinparam nodesep 30
-skinparam ranksep 40
+skinparam nodesep 25
+skinparam ranksep 35
 
 ' ---------- Актори ----------
 actor "Guest" as Guest
 actor "User" as User
 actor "Librarian" as Librarian
 
-' Успадкування
+' Успадкування ролей
 User <|-- Librarian
 
 ' ---------- Система ----------
 rectangle "E-Library System" {
+
+  ' Блок Гостя
   usecase "UC-01: Пошук та перегляд каталогу" as UC01
-  usecase "UC-02: Авторизація (Log In)" as UC02
-  usecase "UC-03: Перегляд історії Loan" as UC03
-  usecase "UC-04: Створення запиту на Loan" as UC04
-  usecase "UC-05: Додавання Book та Author" as UC05
-  usecase "UC-06: Підтвердження повернення книги" as UC06
-  usecase "UC-07: Надсилання сповіщень про борги" as UC07
+  usecase "UC-02: Фільтрація за автором/роком" as UC02
+  usecase "UC-03: Авторизація (Log In)" as UC03
+
+  ' Блок Читача (User)
+  usecase "UC-04: Перегляд історії Loan" as UC04
+  usecase "UC-05: Створення запиту на Loan" as UC05
+  usecase "UC-06: Скасування бронювання" as UC06
+
+  ' Блок Бібліотекаря (Librarian)
+  usecase "UC-07: Додавання Book та Author" as UC07
+  usecase "UC-08: Перевірка унікальності ISBN" as UC08
+  usecase "UC-09: Підтвердження повернення книги" as UC09
+
+  ' Системний прецедент
+  usecase "UC-10: Формування сповіщень про борги" as UC10
 }
 
-' ---------- Зовнішня система ----------
+' ---------- Зовнішній системний сервіс ----------
 rectangle "Notification Service\n<<System>>" as NotifSvc {
 }
 
-' ---------- Зв'язки ----------
+' ---------- Основні зв'язки акторів ----------
 Guest --> UC01
-Guest --> UC02
+Guest --> UC03
 
-User --> UC03
 User --> UC04
+User --> UC05
 
-Librarian --> UC05
-Librarian --> UC06
+Librarian --> UC07
+Librarian --> UC09
 
-UC07 ..> NotifSvc : <<delegate>>
+' ---------- Include та Extend ----------
+UC02 ..> UC01 : <<extend>>
+UC06 ..> UC05 : <<extend>>
+UC07 ..> UC08 : <<include>>
 
-' ---------- Примітки ----------
-note right of UC02
+UC10 ..> NotifSvc : <<delegate>>
+
+' ---------- Примітки (Notes) ----------
+note right of UC03
   **Precondition:**
-  UC-02 є передумовою
-  для авторизованих дій
-  і не використовує <<include>>.
+  UC-03 (Log In) є передумовою
+  для авторизованих дій (UC-04..UC-09)
+  і НЕ використовує <<include>>.
 end note
 
 note bottom of NotifSvc
