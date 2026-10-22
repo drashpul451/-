@@ -1,8 +1,3 @@
----
-
-# 4. `lab2/requirements/traceability-matrix.md`
-
-```markdown
 # Консолідована Матриця Трасування M:N (Вимоги ↔ Use Cases)
 
 ## 1. Реєстр Прецедентів (Use Cases)
