@@ -1,0 +1,67 @@
+@startuml
+title UC-05 / Scenario 1: Успішне бронювання книги (Main Flow)
+autonumber
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam BoxPadding 10
+skinparam ParticipantPadding 10
+
+actor "User" as User
+boundary "Web UI" as UI
+control "LoanController" as API
+control "LoanService" as Service
+database "LoanRepository" as LoanRepo
+database "BookRepository" as BookRepo
+database "Database (3NF)" as DB
+
+User -> UI : 1. Натискає "Забронювати книгу" (bookId)
+activate UI
+
+UI -> API : POST /api/v1/loans\nHeader: Authorization Bearer JWT
+activate API
+
+API -> Service : createLoan(userId, bookId)
+activate Service
+
+' ----- Активація триває протягом усіх перевірок -----
+Service -> LoanRepo : checkActiveOverdueLoans(userId)
+activate LoanRepo
+LoanRepo -> DB : SELECT COUNT(*) FROM loans WHERE user_id = ? AND returned_at IS NULL AND due_date < NOW()
+activate DB
+DB --> LoanRepo : 0 (боргів немає)
+deactivate DB
+LoanRepo --> Service : false (no overdue loans)
+deactivate LoanRepo
+
+alt #LightGreen Борги відсутні [REQ-STA-02 / ADR 0002 Valid]
+    Service -> BookRepo : findAvailableCopy(bookId)
+    activate BookRepo
+    BookRepo -> DB : SELECT * FROM books WHERE id = ? AND is_available = true
+    activate DB
+    DB --> BookRepo : Book entity (found)
+    deactivate DB
+    BookRepo --> Service : BookInstance
+    deactivate BookRepo
+
+    alt #LightBlue Книга є в наявності
+        Service -> LoanRepo : save(new Loan(userId, bookId, PENDING))
+        activate LoanRepo
+        LoanRepo -> DB : INSERT INTO loans (id, user_id, book_id, borrowed_at, due_date) VALUES (...)
+        activate DB
+        DB --> LoanRepo : Loan record (UUID created)
+        deactivate DB
+        LoanRepo --> Service : Loan entity
+        deactivate LoanRepo
+
+        Service --> API : LoanDTO (status: PENDING)
+    end
+end
+
+API --> UI : HTTP 201 Created (LoanDTO)
+deactivate API
+
+UI --> User : Відображає екран підтвердження бронювання
+deactivate Service
+deactivate UI
+
+@enduml
