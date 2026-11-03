@@ -17,5 +17,5 @@
 2) **Із Завданням 2 (Use Cases & Gherkin):** Сценарій 1 повністю реалізує успішне бронювання `US-02`; Сценарій 2 моделює відмову за становою вимогою `REQ-STA-02` (ADR 0002); Сценарій 3 деталізує прецедент `UC-06`, який розширює `UC-05` через `<<extend>>`.
 
 ### Здача:
-(а) Посилання на GitHub PR: `https://github.com/drashpul/e-library/pull/3`  
+(а) Посилання на GitHub: `https://github.com/drashpul/e-library/pull/3](https://github.com/madrashp/-/blob/main/%D0%BB%D0%B0%D0%B13`  
 (б) Цей заповнений DEFENSE.md.
