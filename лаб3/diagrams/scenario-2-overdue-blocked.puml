@@ -1,0 +1,46 @@
+@startuml
+title UC-05 / Scenario 2: Відмова у бронюванні через наявність боргів (ADR 0002 Exception)
+autonumber
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam BoxPadding 10
+
+actor "User" as User
+boundary "Web UI" as UI
+control "LoanController" as API
+control "LoanService" as Service
+database "LoanRepository" as LoanRepo
+database "Database (3NF)" as DB
+
+User -> UI : 1. Натискає "Забронювати книгу" (bookId)
+activate UI
+
+UI -> API : POST /api/v1/loans\nHeader: Authorization Bearer JWT
+activate API
+
+API -> Service : createLoan(userId, bookId)
+activate Service
+
+Service -> LoanRepo : checkActiveOverdueLoans(userId)
+activate LoanRepo
+LoanRepo -> DB : SELECT COUNT(*) FROM loans WHERE user_id = ? AND returned_at IS NULL AND due_date < NOW()
+activate DB
+DB --> LoanRepo : count = 2 (знайдено 2 прострочені видачі)
+deactivate DB
+LoanRepo --> Service : true (has overdue loans)
+deactivate LoanRepo
+
+' ----- Альтернативна гілка блокування -----
+alt #LightPink [ADR 0002 Triggered: hasOverdueLoans == true]
+    Service --> API : throw OverdueLoanException("User has active overdue loans")
+    API --> UI : HTTP 403 Forbidden\n{ "error": "LOAN_BLOCKED_OVERDUE", "message": "Поверніть прострочені книги" }
+    UI --> User : Повідомлення: "Бронювання заблоковано! Спершу поверніть прострочені книги."
+else #LightGreen [No Overdue Loans]
+    note right of Service: Сценарій 1 (Успішна видача)
+end
+
+deactivate Service
+deactivate API
+deactivate UI
+
+@enduml
