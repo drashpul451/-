@@ -1,0 +1,53 @@
+@startuml
+title UC-06 <<extend>> UC-05 / Scenario 3: Скасування бронювання користувачем (Optional Flow)
+autonumber
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam BoxPadding 10
+
+actor "User" as User
+boundary "Web UI" as UI
+control "LoanController" as API
+control "LoanService" as Service
+database "LoanRepository" as LoanRepo
+database "Database (3NF)" as DB
+
+User -> UI : 1. Натискає "Скасувати бронювання" (loanId)
+activate UI
+
+UI -> API : DELETE /api/v1/loans/{loanId}
+activate API
+
+API -> Service : cancelPendingLoan(userId, loanId)
+activate Service
+
+Service -> LoanRepo : findByIdAndUserId(loanId, userId)
+activate LoanRepo
+LoanRepo -> DB : SELECT * FROM loans WHERE id = ? AND user_id = ?
+activate DB
+DB --> LoanRepo : Loan record (status: PENDING)
+deactivate DB
+LoanRepo --> Service : Loan entity
+deactivate LoanRepo
+
+opt #LightYellow [Loan status == PENDING]
+    Service -> LoanRepo : deleteOrUpdateStatus(loanId, CANCELLED)
+    activate LoanRepo
+    LoanRepo -> DB : UPDATE loans SET status = 'CANCELLED' WHERE id = ?
+    activate DB
+    DB --> LoanRepo : OK (1 row updated)
+    deactivate DB
+    LoanRepo --> Service : true
+    deactivate LoanRepo
+    
+    Service --> API : CancellationSuccessDTO
+end
+
+API --> UI : HTTP 200 OK { "status": "CANCELLED" }
+deactivate API
+
+UI --> User : Відображає оновлений список: "Бронювання скасовано"
+deactivate Service
+deactivate UI
+
+@enduml
